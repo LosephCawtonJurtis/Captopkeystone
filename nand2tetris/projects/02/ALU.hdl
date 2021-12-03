@@ -58,7 +58,13 @@ CHIP ALU {
 
     Not16(in=Function, out=NotFunction);
 
-    Mux16(a=Function, b=NotFunction, sel=no, out=out);
+    Mux16(a=Function, b=NotFunction, sel=no, out=out, out[15]=c, out[0..7]=subbus1, out[8..15]=subbus2);
 
-
+    //including this just because I feel like a dumb piece of shit but I was never going to figure this out, the or part here for determining whether or not the final outcome is zero I had to look up and I don't want to forget how fucking stupid this made me feel.
+    Or8Way(in=subbus1, out=zrl);
+    Or8Way(in=subbus2, out=zrr);
+    Or(a=zrl, b=zrr, out=nzr);
+    Not(in=nzr, out=zr);
+    
+    And(a=true, b=c, out=ng);
 }
