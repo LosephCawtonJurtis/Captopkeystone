@@ -23,5 +23,5 @@ CHIP PC {
 	Register(in=becomeDeath, load=true, out=bigout, out=standardout, out=out);
 	
 	// the load setting in the register just has to be set to true, which is fucking infuriating
-	//Got the gates right had to get help with the order online
+	//Got the gates right had to get help with the order in the dumb register shit online
 }
