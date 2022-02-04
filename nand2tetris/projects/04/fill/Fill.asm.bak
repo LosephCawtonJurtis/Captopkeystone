@@ -12,18 +12,3 @@
 // the screen should remain fully clear as long as no key is pressed.
 
 // Put your code here.
-
-(UPDATE)
-@KBD
-D=M
-@BLACKLOOP
-D;JNE
-@WHITELOOP
-D;JEQ
-@UPDATE
-0;JMP
-(BLACKLOOP)
-(WHITELOOP)
-(END)
-@END
-0;JMP
