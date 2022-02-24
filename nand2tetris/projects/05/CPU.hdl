@@ -40,4 +40,22 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+	Mux16(a=instruction, b=ALUout, sel=instruction[15], out=Mux1out);
+	And(a=instruction[15], b=instruction[5], out=CwriteA);
+	Not(in=instruction[15], out=AwriteA);
+	Or(a=CwriteA, b=AwriteA, out=writeA);	
+	Register(in=Mux1out, load=writeA, out=ARegisterOut); //Register A //this will need to be split for PC control
+	And(a=instruction[15], b=instruction[4], out=CwriteD);
+	Register(in=ALUout, load=CwriteD, out=DRegisterOut);
+	And(a=instruction[15], b=instruction[12], out=MwriteALU);
+	Mux16(a=ARegisterOut, b=inM, sel=MwriteALU out=Mux2out);
+	ALU(x=DRegisterOut, y=Mux2out, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=ALUout, out=outM, zr=ZRout, ng=NGout);
+
+
+
+
+
+
+
+
 }
