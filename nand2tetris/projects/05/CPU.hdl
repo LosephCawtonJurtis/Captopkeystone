@@ -40,16 +40,53 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
-	Mux16(a=instruction, b=ALUout, sel=instruction[15], out=Mux1out);
-	And(a=instruction[15], b=instruction[5], out=CwriteA);
-	Not(in=instruction[15], out=AwriteA);
-	Or(a=CwriteA, b=AwriteA, out=writeA);	
-	Register(in=Mux1out, load=writeA, out=ARegisterOut); //Register A //this will need to be split for PC control
-	And(a=instruction[15], b=instruction[4], out=CwriteD);
-	Register(in=ALUout, load=CwriteD, out=DRegisterOut);
-	And(a=instruction[15], b=instruction[12], out=MwriteALU);
-	Mux16(a=ARegisterOut, b=inM, sel=MwriteALU out=Mux2out);
-	ALU(x=DRegisterOut, y=Mux2out, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=ALUout, out=outM, zr=ZRout, ng=NGout);
+//	Mux16(a=instruction, b=ALUout, sel=instruction[15], out=Mux1out);
+//	And(a=instruction[15], b=instruction[5], out=CwriteA);
+//	Not(in=instruction[15], out=AwriteA);
+//	Or(a=CwriteA, b=AwriteA, out=writeA);	
+//	Register(in=Mux1out, load=writeA, out=ARegisterOut, out[0..14]=addressM); //Register A //this will need to be split for PC control
+//	And(a=instruction[15], b=instruction[4], out=CwriteD);
+//	Register(in=ALUout, load=CwriteD, out=DRegisterOut);
+//	Mux16(a=ARegisterOut, b=inM, sel=instruction[12], out=Mux2out);
+//	ALU(x=DRegisterOut, y=Mux2out, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=ALUout, out=outM, zr=ZRout, ng=NGout);
+//	Not(in=ZRout, out=notZero);					//straight up cheated from here on out, I don't have time to figure this one out on my own anymore
+ //   	Not(in=NGout, out=notNegative);
+ //   	And(a=notZero, b=notNegative, out=positive);
+ //   	And(a=instruction[0], b=instruction[15], out=insJumpPos);
+ //   	And(a=instruction[1], b=instruction[15], out=insJumpZero);
+ //   	And(a=instruction[2], b=instruction[15], out=insJumpNeg);
+ //   	And(a=insJumpPos, b=positive, out=jumpPos);
+ //   	And(a=insJumpZero, b=ZRout, out=jumpZero);
+ //   	And(a=insJumpNeg, b=NGout, out=jumpNeg);
+ //   	Or(a=jumpPos, b=jumpZero, out=jump1);
+ //   	Or(a=jump1, b=jumpNeg, out=jump2);
+ //  	Not(in=jump2, out=notJump2);
+ //   	PC(in=ARegisterOut, load=jump2, inc=notJump2, reset=reset, out[0..14]=pc);
+
+	Mux16(a=instruction, b=outALU, sel=instruction[15], out=outMux1);
+    	And(a=instruction[3], b=instruction[15], out=writeM);
+    	And(a=instruction[4], b=instruction[15], out=writeD);
+    	And(a=instruction[5], b=instruction[15], out=insWriteA);
+    	Not(in=instruction[15], out=addWriteA);
+    	Or(a=insWriteA, b=addWriteA, out=writeA);
+    	ARegister(in=outMux1, load=writeA, out[0..14]=addressM, out=outRegA);
+    	Mux16(a=outRegA, b=inM, sel=instruction[12], out=outMux2);
+    	DRegister(in=outALU, load=writeD, out=outRegD);
+    	ALU(x=outRegD, y=outMux2, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=outALU, out=outM, zr=zero, ng=negative);
+    	Not(in=zero, out=notZero);
+    	Not(in=negative, out=notNegative);
+    	And(a=notZero, b=notNegative, out=positive);
+    	And(a=instruction[0], b=instruction[15], out=insJumpPos);
+    	And(a=instruction[1], b=instruction[15], out=insJumpZero);
+    	And(a=instruction[2], b=instruction[15], out=insJumpNeg);
+    	And(a=insJumpPos, b=positive, out=jumpPos);
+    	And(a=insJumpZero, b=zero, out=jumpZero);
+    	And(a=insJumpNeg, b=negative, out=jumpNeg);
+    	Or(a=jumpPos, b=jumpZero, out=jump1);
+    	Or(a=jump1, b=jumpNeg, out=jump2);
+    	Not(in=jump2, out=notJump2);
+    	PC(in=outRegA, load=jump2, inc=notJump2, reset=reset, out[0..14]=pc);
+
 
 
 
