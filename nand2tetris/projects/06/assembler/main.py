@@ -1,9 +1,11 @@
 checkAT = '@'
 checkEQ = '='
 checkSMI = ';'
+checkPAR = '('
 null = None
 rf_name = input('filename: ')
 wf_name = rf_name[:-4]+'.hack'
+variableIndex = 16
 
 Dest_Dict = {'M': '001', 'D': '010', 'MD': '011', 'A': '100', 'AM': '101',
              'AD': '110', 'AMD': '111'}
@@ -20,6 +22,10 @@ Comp_Dict = {'0': '0101010', '1': '0111111', '-1': '0111010', 'D': '0001100',
              'M+1': '1110111', 'M-1': '1110010', 'D+M': '1000010',
              'D-M': '1010011', 'M-D': '1000111', 'D&M': '1000000',
              'D|M': '1010101'}
+
+Symbo_Dict = {'R0': '0', 'R1': '1', 'R2': '2', 'R3': '3', 'R4': '4', 'R5': '5', 'R6': '6', 'R7': '7', 'R8': '8',
+              'R9': '9', 'R10': '10', 'R11': '11', 'R12': '12', 'R13': '13', 'R14': '14', 'R15': '15',
+              'SCREEN': '16384', 'KBD': '24576', 'SP': '0', 'LCL': '1', 'ARG': '2', 'THIS': '3', 'THAT': '4'}
 
 
 def parseline(instruction):
@@ -84,7 +90,31 @@ def loop_through_dict(critter, dict):
 
 
 with open(rf_name, 'r') as read_file, open(wf_name, 'w') as write_file:
+    for line in read_file: # FIRST PASS
+        if line.startswith("//") or line == "\n":
+            continue
+        else:
+            line = line.partition('//')[0]  # split line and grab only text before the comment // my good friend Wesley Elmer had comment cleaning code laying
+            line = line.rstrip()  # remove whitespace from line                                // laying around that has been revived and introduced here
+        if checkPAR in line:
+            label = line.split('(')
+            if loop_through_dict(label[1], Symbo_Dict) == null:
+                Symbo_Dict[label[1]] = variableIndex
+                variableIndex += 1
+    for line in read_file: # SECOND PASS
+        if line.startswith("//") or line == "\n":
+            continue
+        else:
+            line = line.partition('//')[0]  # split line and grab only text before the comment // my good friend Wesley Elmer had comment cleaning code laying
+            line = line.rstrip()  # remove whitespace from line                                // laying around that has been revived and introduced here
+        if checkAT in line:
+            variable = line.split('@')
+            if loop_through_dict(variable[1], Symbo_Dict) == null:
+                Symbo_Dict[variable[1]] = variableIndex
+                variableIndex += 1
+                print(Symbo_Dict)
     for line in read_file:
+        print("I'm getting here")
         if line.startswith("//") or line == "\n": continue
         else:
             line = line.partition('//')[0]  # split line and grab only text before the comment // my good friend Wesley Elmer had comment cleaning code laying
