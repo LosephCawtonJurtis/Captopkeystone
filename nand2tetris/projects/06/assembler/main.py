@@ -85,8 +85,9 @@ def loop_through_dict(critter, dict):
 
 with open(rf_name, 'r') as read_file, open(wf_name, 'w') as write_file:
     for line in read_file:
-        if line.startswith("/") or line == "\n": line = read_file.__next__()
-        line = line.partition('//')[0]  # split line and grab only text before the comment // my good friend Wesley Elmer had comment cleaning code laying
-        line = line.rstrip()  # remove whitespace from line                                // laying around that has been revived and introduced here
+        if line.startswith("//") or line == "\n": continue
+        else:
+            line = line.partition('//')[0]  # split line and grab only text before the comment // my good friend Wesley Elmer had comment cleaning code laying
+            line = line.rstrip()  # remove whitespace from line                                // laying around that has been revived and introduced here
         #line += "\n"                                                                       //
         write_file.write(translate_instruction(line)+'\n')
