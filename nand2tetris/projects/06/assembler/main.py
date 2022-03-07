@@ -6,6 +6,7 @@ null = None
 rf_name = input('filename: ')
 wf_name = rf_name[:-4]+'.hack'
 variableIndex = 16
+line_count = 0
 
 Dest_Dict = {'M': '001', 'D': '010', 'MD': '011', 'A': '100', 'AM': '101',
              'AD': '110', 'AMD': '111'}
@@ -68,11 +69,18 @@ def fix_AT(currentATvalue):
     finalAT = '0000000000000000'
     return finalAT[:amount_to_keep]+currentATvalue
 
+def contains_nondigit(AT_check_for_nondigit):
+    for char in AT_check_for_nondigit:
+        if not char.isdigit():
+            return True
 
 def translate_instruction(line):
     parts = parseline(line)
-    if parts[0] != null:
+    if parts[0] != null and not contains_nondigit(parts[0]):
         return fix_AT(str(bin(int(parts[0])).replace('0b', '')))
+    elif parts[0] != null and contains_nondigit(str(parts[0])):
+        newAT = loop_through_dict(parts[0], Symbo_Dict)
+        return fix_AT(str(bin(int(newAT)).replace('0b', '')))
     else:
         finalComp = loop_through_dict(str(parts[1]).strip(), Comp_Dict)
         finalDest = loop_through_dict(str(parts[2]).strip(), Dest_Dict)
@@ -89,18 +97,24 @@ def loop_through_dict(critter, dict):
             return dict[key]
 
 
-with open(rf_name, 'r') as read_file, open(wf_name, 'w') as write_file:
+with open(rf_name, 'r') as read_file:
     for line in read_file: # FIRST PASS
         if line.startswith("//") or line == "\n":
             continue
         else:
             line = line.partition('//')[0]  # split line and grab only text before the comment // my good friend Wesley Elmer had comment cleaning code laying
             line = line.rstrip()  # remove whitespace from line                                // laying around that has been revived and introduced here
+            if not checkPAR in line:
+                line_count += 1
         if checkPAR in line:
             label = line.split('(')
-            if loop_through_dict(label[1], Symbo_Dict) == null:
-                Symbo_Dict[label[1]] = variableIndex
-                variableIndex += 1
+            label = label[1][:-1]
+            if loop_through_dict(label, Symbo_Dict) == null:
+                Symbo_Dict[label] = line_count
+                print(Symbo_Dict)
+
+
+with open(rf_name, 'r') as read_file:
     for line in read_file: # SECOND PASS
         if line.startswith("//") or line == "\n":
             continue
@@ -113,9 +127,12 @@ with open(rf_name, 'r') as read_file, open(wf_name, 'w') as write_file:
                 Symbo_Dict[variable[1]] = variableIndex
                 variableIndex += 1
                 print(Symbo_Dict)
+
+
+with open(rf_name, 'r') as read_file, open(wf_name, 'w') as write_file:
     for line in read_file:
         print("I'm getting here")
-        if line.startswith("//") or line == "\n": continue
+        if line.startswith("//") or line == "\n" or checkPAR in line: continue
         else:
             line = line.partition('//')[0]  # split line and grab only text before the comment // my good friend Wesley Elmer had comment cleaning code laying
             line = line.rstrip()  # remove whitespace from line                                // laying around that has been revived and introduced here
