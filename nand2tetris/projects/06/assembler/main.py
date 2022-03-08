@@ -132,9 +132,9 @@ with open(rf_name, 'r') as read_file:
 with open(rf_name, 'r') as read_file, open(wf_name, 'w') as write_file:
     for line in read_file:
         print("I'm getting here")
-        if line.startswith("//") or line == "\n" or checkPAR in line: continue
+        if line.startswith("//") or line == "\n": continue
         else:
             line = line.partition('//')[0]  # split line and grab only text before the comment // my good friend Wesley Elmer had comment cleaning code laying
             line = line.rstrip()  # remove whitespace from line                                // laying around that has been revived and introduced here
-        #line += "\n"                                                                       //
-        write_file.write(translate_instruction(line)+'\n')
+        if checkPAR not in line:
+            write_file.write(translate_instruction(line)+'\n')
