@@ -6,6 +6,12 @@ null = None
 keyword = ['class', 'constructor', 'function', 'method', 'field', 'static', 'var', 'int', 'char', 'boolean', 'void',
            'true', 'false', 'null', 'this', 'let', 'do', 'if', 'else', 'while', 'return']
 symbol = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', '/', '<', '>', '=', '~']
+symbol_rewrite = {
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "&": "&amp;"
+}
 integer_constant = null
 string_constant = ''
 identifier = ''
@@ -33,6 +39,8 @@ def sort(block):
         key_type = 0
     elif block in symbol:
         key_type = 1
+        if block in ('<', '>', '"', '&'):
+            block = symbol_rewrite[block]
     elif block.isdigit():
         key_type = 2
     elif block.startswith('"') and block.endswith('"'):
